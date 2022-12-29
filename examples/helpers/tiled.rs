@@ -230,6 +230,7 @@ pub fn process_loaded_maps(
                                     .clone_weak(),
                             ),
                             tile_size,
+                            physical_tile_size: tile_size.into(),
                             spacing: tile_spacing,
                             transform: get_tilemap_center_transform(
                                 &map_size,

@@ -23,17 +23,9 @@ fn startup(mut commands: Commands, asset_server: Res<AssetServer>) {
         &mut tile_storage,
     );
 
-    let physical_size = 8.0;
-
     let tile_size = TilemapTileSize { x: 16.0, y: 16.0 };
-    let grid_size = TilemapGridSize {
-        x: physical_size,
-        y: physical_size,
-    };
-    let physical_tile_size = TilemapPhysicalTileSize {
-        x: physical_size,
-        y: physical_size,
-    };
+    let grid_size = tile_size.into();
+
     println!("{:#?}", grid_size);
     let map_type = TilemapType::default();
 
@@ -44,7 +36,7 @@ fn startup(mut commands: Commands, asset_server: Res<AssetServer>) {
         storage: tile_storage,
         texture: TilemapTexture::Single(texture_handle),
         tile_size,
-        physical_tile_size,
+        physical_tile_size: tile_size.into(),
         transform: get_tilemap_center_transform(&map_size, &grid_size, &map_type, 0.0),
         ..Default::default()
     });
