@@ -191,7 +191,7 @@ pub struct RenderChunk2d {
     /// The grid size of the map this chunk belongs to.
     pub grid_size: TilemapGridSize,
     /// The tile size of the map this chunk belongs to.
-    tile_size: TilemapTileSize,
+    pub tile_size: TilemapTileSize,
     /// The physical tile size of the map this chunk belongs to.
     physical_tile_size: TilemapPhysicalTileSize,
     /// The [`Aabb`] of this chunk, based on the map type, grid size, and tile size. It is not
