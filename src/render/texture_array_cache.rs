@@ -141,6 +141,14 @@ impl TextureArrayCache {
     ) {
         let prepare_queue = self.prepare_queue.drain().collect::<Vec<_>>();
         for texture in prepare_queue.iter() {
+            // Fixes issue where default handle causes a crash. There should be a better
+            // way of fixing this.
+            if let TilemapTexture::Single(t) = texture {
+                if bevy::prelude::Handle::default() == t.clone_weak() {
+                    return;
+                }
+            }
+
             match texture {
                 TilemapTexture::Single(_) | TilemapTexture::Vector(_) => {
                     let (count, tile_size, _, _, filter, format) =

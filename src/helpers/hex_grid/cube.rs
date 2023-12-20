@@ -1,6 +1,9 @@
 //! Code for the cube coordinate system
 
-use crate::helpers::hex_grid::axial::{AxialPos, FractionalAxialPos};
+use crate::{
+    helpers::hex_grid::axial::{AxialPos, FractionalAxialPos},
+    tiles::TilePos,
+};
 use std::ops::{Add, Mul, Sub};
 
 /// Identical to [`AxialPos`], but has an extra component `s`. Together, `q`, `r`, `s`
@@ -17,6 +20,7 @@ use std::ops::{Add, Mul, Sub};
 /// (RBG). Note however, that while positive `r` goes "downward" in RBG's article, we consider it as
 /// going "upward".
 #[derive(Clone, Copy, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct CubePos {
     pub q: i32,
     pub r: i32,
@@ -28,6 +32,13 @@ impl From<AxialPos> for CubePos {
     fn from(axial_pos: AxialPos) -> Self {
         let AxialPos { q, r } = axial_pos;
         CubePos { q, r, s: -(q + r) }
+    }
+}
+
+impl From<TilePos> for CubePos {
+    #[inline]
+    fn from(tile_pos: TilePos) -> Self {
+        AxialPos::from(tile_pos).into()
     }
 }
 
@@ -92,6 +103,10 @@ impl Mul<CubePos> for u32 {
 }
 
 impl CubePos {
+    pub fn new(q: i32, r: i32, s: i32) -> Self {
+        Self { q, r, s }
+    }
+
     /// The magnitude of a cube position is its distance away from `[0, 0, 0]` in the cube grid.
     ///
     /// See the Red Blob Games article for a [helpful interactive diagram](https://www.redblobgames.com/grids/hexagons/#distances-cube).
@@ -109,6 +124,7 @@ impl CubePos {
 }
 
 #[derive(Clone, Copy, Debug, PartialOrd, PartialEq)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct FractionalCubePos {
     q: f32,
     r: f32,
@@ -123,6 +139,10 @@ impl From<FractionalAxialPos> for FractionalCubePos {
 }
 
 impl FractionalCubePos {
+    pub fn new(q: f32, r: f32, s: f32) -> Self {
+        Self { q, r, s }
+    }
+
     /// Returns `self` rounded to a [`CubePos`] that contains `self`. This is particularly useful
     /// for determining the hex tile that this fractional position is in.
     #[inline]

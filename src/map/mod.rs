@@ -1,4 +1,6 @@
 use bevy::asset::Assets;
+use bevy::ecs::entity::{EntityMapper, MapEntities};
+use bevy::ecs::reflect::ReflectMapEntities;
 use bevy::prelude::{ReflectComponent, Res, ResMut, Resource};
 use bevy::render::render_resource::TextureUsages;
 use bevy::{
@@ -41,8 +43,14 @@ pub struct TilemapRenderSettings {
 
 /// A component which stores a reference to the tilemap entity.
 #[derive(Component, Reflect, Clone, Copy, Debug, Hash)]
-#[reflect(Component)]
+#[reflect(Component, MapEntities)]
 pub struct TilemapId(pub Entity);
+
+impl MapEntities for TilemapId {
+    fn map_entities(&mut self, entity_mapper: &mut EntityMapper) {
+        self.0 = entity_mapper.get_or_reserve(self.0);
+    }
+}
 
 impl Default for TilemapId {
     fn default() -> Self {
@@ -59,6 +67,10 @@ pub struct TilemapSize {
 }
 
 impl TilemapSize {
+    pub fn new(x: u32, y: u32) -> Self {
+        Self { x, y }
+    }
+
     pub fn count(&self) -> usize {
         (self.x * self.y) as usize
     }
@@ -201,6 +213,12 @@ pub struct TilemapTileSize {
     pub y: f32,
 }
 
+impl TilemapTileSize {
+    pub fn new(x: f32, y: f32) -> Self {
+        Self { x, y }
+    }
+}
+
 impl From<TilemapTileSize> for TilemapGridSize {
     fn from(tile_size: TilemapTileSize) -> Self {
         TilemapGridSize {
@@ -291,6 +309,12 @@ pub struct TilemapGridSize {
     pub y: f32,
 }
 
+impl TilemapGridSize {
+    pub fn new(x: f32, y: f32) -> Self {
+        Self { x, y }
+    }
+}
+
 impl From<TilemapGridSize> for Vec2 {
     fn from(grid_size: TilemapGridSize) -> Self {
         Vec2::new(grid_size.x, grid_size.y)
@@ -331,6 +355,10 @@ impl From<TilemapSpacing> for Vec2 {
 }
 
 impl TilemapSpacing {
+    pub fn new(x: f32, y: f32) -> Self {
+        Self { x, y }
+    }
+
     pub fn zero() -> Self {
         Self { x: 0.0, y: 0.0 }
     }
@@ -342,6 +370,12 @@ impl TilemapSpacing {
 pub struct TilemapTextureSize {
     pub x: f32,
     pub y: f32,
+}
+
+impl TilemapTextureSize {
+    pub fn new(x: f32, y: f32) -> Self {
+        Self { x, y }
+    }
 }
 
 impl From<TilemapTextureSize> for Vec2 {

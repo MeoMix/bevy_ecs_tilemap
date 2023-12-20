@@ -7,12 +7,17 @@ use crate::{TilemapGridSize, TilemapSize};
 use bevy::math::Vec2;
 
 #[derive(Clone, Copy, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct RowOddPos {
     pub q: i32,
     pub r: i32,
 }
 
 impl RowOddPos {
+    pub fn new(q: i32, r: i32) -> Self {
+        Self { q, r }
+    }
+
     /// Returns the position of this tile's center, in world space.
     #[inline]
     pub fn center_in_world(&self, grid_size: &TilemapGridSize) -> Vec2 {
@@ -93,12 +98,17 @@ impl From<&TilePos> for RowOddPos {
 }
 
 #[derive(Clone, Copy, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct RowEvenPos {
     pub q: i32,
     pub r: i32,
 }
 
 impl RowEvenPos {
+    pub fn new(q: i32, r: i32) -> Self {
+        Self { q, r }
+    }
+
     /// Returns the position of this tile's center, in world space.
     #[inline]
     pub fn center_in_world(&self, grid_size: &TilemapGridSize) -> Vec2 {
@@ -179,12 +189,17 @@ impl From<&TilePos> for RowEvenPos {
 }
 
 #[derive(Clone, Copy, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct ColOddPos {
     pub q: i32,
     pub r: i32,
 }
 
 impl ColOddPos {
+    pub fn new(q: i32, r: i32) -> Self {
+        Self { q, r }
+    }
+
     /// Returns the position of this tile's center, in world space.
     #[inline]
     pub fn center_in_world(&self, grid_size: &TilemapGridSize) -> Vec2 {
@@ -265,12 +280,17 @@ impl From<&TilePos> for ColOddPos {
 }
 
 #[derive(Clone, Copy, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct ColEvenPos {
     pub q: i32,
     pub r: i32,
 }
 
 impl ColEvenPos {
+    pub fn new(q: i32, r: i32) -> Self {
+        Self { q, r }
+    }
+
     /// Returns the position of this tile's center, in world space.
     #[inline]
     pub fn center_in_world(&self, grid_size: &TilemapGridSize) -> Vec2 {

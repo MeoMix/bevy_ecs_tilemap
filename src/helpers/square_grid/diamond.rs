@@ -18,6 +18,7 @@ use std::ops::{Add, Mul, Sub};
 /// A `DiamondPos` can be mapped to world space, and a world space position can be mapped to
 /// the tile with `DiamondPos` containing said world space position.
 #[derive(Clone, Copy, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct DiamondPos {
     pub x: i32,
     pub y: i32,
@@ -122,6 +123,10 @@ impl From<&SquarePos> for DiamondPos {
 }
 
 impl DiamondPos {
+    pub fn new(x: i32, y: i32) -> Self {
+        Self { x, y }
+    }
+
     /// Project a vector representing a fractional tile position (i.e. the components can be `f32`)
     /// into world space.
     ///

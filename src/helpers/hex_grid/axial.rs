@@ -30,17 +30,24 @@ use std::ops::{Add, Mul, Sub};
 /// however, that while positive `r` goes "downward" in RBG's article, we consider it as going
 /// "upward".
 #[derive(Clone, Copy, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct AxialPos {
     pub q: i32,
     pub r: i32,
 }
 
-impl From<&TilePos> for AxialPos {
-    fn from(tile_pos: &TilePos) -> Self {
+impl From<TilePos> for AxialPos {
+    fn from(tile_pos: TilePos) -> Self {
         AxialPos {
             q: tile_pos.x as i32,
             r: tile_pos.y as i32,
         }
+    }
+}
+
+impl From<&TilePos> for AxialPos {
+    fn from(tile_pos: &TilePos) -> Self {
+        AxialPos::from(*tile_pos)
     }
 }
 
@@ -212,6 +219,10 @@ pub const UNIT_R: AxialPos = AxialPos { q: 0, r: -1 };
 pub const UNIT_S: AxialPos = AxialPos { q: 1, r: -1 };
 
 impl AxialPos {
+    pub fn new(q: i32, r: i32) -> Self {
+        Self { q, r }
+    }
+
     /// The magnitude of an axial position is its distance away from `(0, 0)` in the hex grid.
     ///
     /// See the Red Blob Games article for a [helpful interactive diagram](https://www.redblobgames.com/grids/hexagons/#distances-cube).
@@ -467,12 +478,17 @@ impl AxialPos {
 ///
 /// It can be rounded into an [`AxialPos`].
 #[derive(Clone, Copy, Debug, PartialOrd, PartialEq)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct FractionalAxialPos {
     pub q: f32,
     pub r: f32,
 }
 
 impl FractionalAxialPos {
+    pub fn new(q: f32, r: f32) -> Self {
+        Self { q, r }
+    }
+
     #[inline]
     fn round(&self) -> AxialPos {
         let frac_cube_pos = FractionalCubePos::from(*self);

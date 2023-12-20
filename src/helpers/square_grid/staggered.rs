@@ -15,6 +15,7 @@ use std::ops::{Add, Mul, Sub};
 /// Under the hood, in order to reduce code duplication, a `StaggeredPos` is mapped to
 /// [`DiamondPos`] for world space to grid space related calculations.
 #[derive(Clone, Copy, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct StaggeredPos {
     pub x: i32,
     pub y: i32,
@@ -89,6 +90,10 @@ impl Mul<StaggeredPos> for i32 {
 }
 
 impl StaggeredPos {
+    pub fn new(x: i32, y: i32) -> Self {
+        Self { x, y }
+    }
+
     /// Returns the position of this tile's center, in world space.
     #[inline]
     pub fn center_in_world(&self, grid_size: &TilemapGridSize) -> Vec2 {
