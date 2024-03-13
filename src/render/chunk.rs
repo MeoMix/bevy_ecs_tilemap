@@ -3,6 +3,7 @@ use std::hash::{Hash, Hasher};
 use bevy::math::Mat4;
 use bevy::prelude::{InheritedVisibility, Resource, Transform};
 use bevy::render::primitives::Aabb;
+use bevy::render::render_asset::RenderAssetUsages;
 use bevy::{
     math::{UVec2, UVec3, UVec4, Vec2, Vec3Swizzles, Vec4, Vec4Swizzles},
     prelude::{Component, Entity, GlobalTransform, Mesh, Vec3},
@@ -22,6 +23,8 @@ use crate::{
     tiles::TilePos,
     FrustumCulling, TilemapGridSize, TilemapTileSize,
 };
+
+use super::RenderChunkSize;
 
 #[derive(Resource, Default, Clone, Debug)]
 pub struct RenderChunk2dStorage {
@@ -53,6 +56,8 @@ impl RenderChunk2dStorage {
         transform: GlobalTransform,
         visibility: &InheritedVisibility,
         frustum_culling: &FrustumCulling,
+        render_size: RenderChunkSize,
+        y_sort: bool,
     ) -> &mut RenderChunk2d {
         let pos = position.xyz();
 
@@ -89,6 +94,8 @@ impl RenderChunk2dStorage {
                 transform,
                 visibility.get(),
                 **frustum_culling,
+                render_size,
+                y_sort,
             );
             self.entity_to_chunk.insert(chunk_entity, pos);
             chunk_storage.insert(pos, chunk);
@@ -213,6 +220,8 @@ pub struct RenderChunk2d {
     pub dirty_mesh: bool,
     pub visible: bool,
     pub frustum_culling: bool,
+    pub render_size: RenderChunkSize,
+    pub y_sort: bool,
 }
 
 impl RenderChunk2d {
@@ -233,6 +242,8 @@ impl RenderChunk2d {
         global_transform: GlobalTransform,
         visible: bool,
         frustum_culling: bool,
+        render_size: RenderChunkSize,
+        y_sort: bool,
     ) -> Self {
         let position = chunk_index_to_world_space(index.xy(), size_in_tiles, &grid_size, &map_type);
         let local_transform = Transform::from_translation(position.extend(0.0));
@@ -257,7 +268,10 @@ impl RenderChunk2d {
             global_transform,
             transform,
             transform_matrix,
-            mesh: Mesh::new(bevy::render::render_resource::PrimitiveTopology::TriangleList),
+            mesh: Mesh::new(
+                bevy::render::render_resource::PrimitiveTopology::TriangleList,
+                RenderAssetUsages::default(),
+            ),
             spacing,
             texture_size,
             texture,
@@ -265,6 +279,8 @@ impl RenderChunk2d {
             tiles: vec![None; (size_in_tiles.x * size_in_tiles.y) as usize],
             visible,
             frustum_culling,
+            render_size,
+            y_sort,
         }
     }
 
@@ -417,7 +433,7 @@ impl RenderChunk2d {
                 crate::render::ATTRIBUTE_COLOR,
                 VertexAttributeValues::Float32x4(colors),
             );
-            self.mesh.set_indices(Some(Indices::U32(indices)));
+            self.mesh.insert_indices(Indices::U32(indices));
 
             let vertex_buffer_data = self.mesh.get_vertex_buffer_data();
             let vertex_buffer = device.create_buffer_with_data(&BufferInitDescriptor {

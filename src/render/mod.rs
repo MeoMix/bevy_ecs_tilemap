@@ -16,13 +16,13 @@ use bevy::{
 #[cfg(not(feature = "atlas"))]
 use bevy::render::renderer::RenderDevice;
 
-use crate::render::{
-    material::{MaterialTilemapPlugin, StandardTilemapMaterial},
-    prepare::{MeshUniformResource, TilemapUniformResource},
-};
+use crate::tiles::{TilePos, TileStorage};
 use crate::{
-    prelude::{TilemapRenderSettings, TilemapTexture},
-    tiles::{TilePos, TileStorage},
+    prelude::TilemapTexture,
+    render::{
+        material::{MaterialTilemapPlugin, StandardTilemapMaterial},
+        prepare::{MeshUniformResource, TilemapUniformResource},
+    },
 };
 
 use self::{
@@ -49,9 +49,6 @@ use self::extract::ExtractedTilemapTexture;
 #[cfg(not(feature = "atlas"))]
 pub(crate) use self::texture_array_cache::TextureArrayCache;
 
-/// The default chunk_size (in tiles) used per mesh.
-const CHUNK_SIZE_2D: UVec2 = UVec2::from_array([64, 64]);
-
 #[derive(Copy, Clone, Debug, Component)]
 pub(crate) struct ExtractedFilterMode(FilterMode);
 
@@ -62,11 +59,11 @@ pub struct DefaultSampler(ImageSamplerDescriptor);
 ///
 /// Initialized from [`TilemapRenderSettings`](crate::map::TilemapRenderSettings) resource, if
 /// provided. Otherwise, defaults to `64 x 64`.
-#[derive(Resource, Debug, Copy, Clone, Deref)]
+#[derive(Debug, Copy, Clone, Deref)]
 pub(crate) struct RenderChunkSize(UVec2);
 
 impl RenderChunkSize {
-    pub fn new(chunk_size: UVec2) -> RenderChunkSize {
+    pub const fn new(chunk_size: UVec2) -> RenderChunkSize {
         RenderChunkSize(chunk_size)
     }
 
@@ -84,13 +81,6 @@ impl RenderChunkSize {
         tile_pos - (*chunk_position * self.0)
     }
 }
-
-/// Sorts chunks using Y sort during render.
-///
-/// Initialized from [`TilemapRenderSettings`](crate::map::TilemapRenderSettings) resource, if
-/// provided. Otherwise, defaults to false.
-#[derive(Resource, Debug, Copy, Clone, Deref)]
-pub struct RenderYSort(bool);
 
 pub struct TilemapRenderingPlugin;
 
@@ -116,7 +106,7 @@ impl Plugin for TilemapRenderingPlugin {
         app.add_systems(Update, set_texture_to_copy_src);
 
         app.add_systems(First, clear_removed);
-        app.add_systems(PostUpdate, (removal_helper_tilemap, removal_helper));
+        app.add_systems(PostUpdate, (removal_helper, removal_helper_tilemap));
 
         app.add_plugins(MaterialTilemapPlugin::<StandardTilemapMaterial>::default());
 
@@ -129,15 +119,6 @@ impl Plugin for TilemapRenderingPlugin {
     }
 
     fn finish(&self, app: &mut App) {
-        // Extract the chunk size from the TilemapRenderSettings used to initialize the
-        // ChunkCoordinate resource to insert into the render pipeline
-        let (chunk_size, y_sort) = {
-            match app.world.get_resource::<TilemapRenderSettings>() {
-                Some(settings) => (settings.render_chunk_size, settings.y_sort),
-                None => (CHUNK_SIZE_2D, false),
-            }
-        };
-
         let sampler = app.get_added_plugins::<ImagePlugin>().first().map_or_else(
             || ImagePlugin::default_nearest().default_sampler,
             |plugin| plugin.default_sampler.clone(),
@@ -242,8 +223,6 @@ impl Plugin for TilemapRenderingPlugin {
 
         render_app
             .insert_resource(DefaultSampler(sampler))
-            .insert_resource(RenderChunkSize(chunk_size))
-            .insert_resource(RenderYSort(y_sort))
             .insert_resource(RenderChunk2dStorage::default())
             .insert_resource(SecondsSinceStartup(0.0))
             .add_systems(

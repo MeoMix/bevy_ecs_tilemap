@@ -1,13 +1,11 @@
 use bevy::math::Affine3A;
-use bevy::prelude::Res;
-use bevy::prelude::Time;
 use bevy::render::primitives::{Aabb, Frustum};
 use bevy::render::render_resource::FilterMode;
 use bevy::render::render_resource::TextureFormat;
-use bevy::{math::Vec4, prelude::*, render::Extract, utils::HashMap};
+use bevy::{prelude::*, render::Extract, utils::HashMap};
 
 use crate::prelude::TilemapGridSize;
-use crate::prelude::TilemapPhysicalTileSize;
+use crate::prelude::{TilemapPhysicalTileSize, TilemapRenderSettings};
 use crate::render::{DefaultSampler, SecondsSinceStartup};
 use crate::tiles::AnimatedTile;
 use crate::tiles::TilePosOld;
@@ -70,6 +68,7 @@ pub struct ExtractedTilemapBundle {
     map_size: TilemapSize,
     visibility: InheritedVisibility,
     frustum_culling: FrustumCulling,
+    render_settings: TilemapRenderSettings,
 }
 
 #[derive(Component)]
@@ -223,6 +222,7 @@ pub fn extract(
             &TilemapSize,
             &InheritedVisibility,
             &FrustumCulling,
+            &TilemapRenderSettings,
         )>,
     >,
     changed_tilemap_query: Extract<
@@ -240,6 +240,7 @@ pub fn extract(
                 Changed<TilemapSize>,
                 Changed<InheritedVisibility>,
                 Changed<FrustumCulling>,
+                Changed<TilemapRenderSettings>,
             )>,
         >,
     >,
@@ -305,6 +306,7 @@ pub fn extract(
                     map_size: *data.8,
                     visibility: *data.9,
                     frustum_culling: *data.10,
+                    render_settings: *data.11,
                 },
             ),
         );
@@ -341,6 +343,7 @@ pub fn extract(
                         map_size: *data.8,
                         visibility: *data.9,
                         frustum_culling: *data.10,
+                        render_settings: *data.11,
                     },
                 ),
             );
@@ -351,7 +354,7 @@ pub fn extract(
         extracted_tilemaps.drain().map(|kv| kv.1).collect();
 
     // Extracts tilemap textures.
-    for (entity, _, tile_size, _physical_tile_size, tile_spacing, _, _, texture, _, _, _) in
+    for (entity, _, tile_size, _physical_tile_size, tile_spacing, _, _, texture, _, _, _, _) in
         tilemap_query.iter()
     {
         if texture.verify_ready(&images) {

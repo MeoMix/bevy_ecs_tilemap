@@ -26,7 +26,7 @@ use map::{
     TilemapGridSize, TilemapSize, TilemapSpacing, TilemapTexture, TilemapTextureSize,
     TilemapTileSize, TilemapType,
 };
-use prelude::{TilemapId, TilemapPhysicalTileSize};
+use prelude::{TilemapId, TilemapPhysicalTileSize, TilemapRenderSettings};
 #[cfg(feature = "render")]
 use render::material::{MaterialTilemap, StandardTilemapMaterial};
 use tiles::{
@@ -115,6 +115,7 @@ pub struct MaterialTilemapBundle<M: MaterialTilemap> {
     pub physical_tile_size: TilemapPhysicalTileSize,
     pub transform: Transform,
     pub global_transform: GlobalTransform,
+    pub render_settings: TilemapRenderSettings,
     /// User indication of whether an entity is visible
     pub visibility: Visibility,
     /// Algorithmically-computed indication of whether an entity is visible and should be extracted
@@ -139,6 +140,7 @@ pub struct StandardTilemapBundle {
     pub tile_size: TilemapTileSize,
     pub transform: Transform,
     pub global_transform: GlobalTransform,
+    pub render_settings: TilemapRenderSettings,
     /// User indication of whether an entity is visible
     pub visibility: Visibility,
     /// Algorithmically-computed indication of whether an entity is visible and should be extracted
