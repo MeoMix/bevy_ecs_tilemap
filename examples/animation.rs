@@ -3,8 +3,6 @@ use bevy::{
     prelude::*,
 };
 use bevy_ecs_tilemap::prelude::*;
-use bevy_ecs_tilemap::tiles::{AnimatedTile, TileBundle, TilePos, TileStorage, TileTextureIndex};
-use bevy_ecs_tilemap::TilemapPlugin;
 use rand::seq::IteratorRandom;
 use rand::thread_rng;
 

@@ -1,7 +1,9 @@
 # NOTE: mold linker doesn't support rustlang/rust:nightly - requires Debian. Swapping to rust:nightly would require using lld linker.
 # NOTE: mold does not support wasm https://github.com/rui314/mold/issues/555
-FROM rust:1.74-bookworm
+FROM rust:1.76-bookworm
 # FROM rustlang/rust:nightly
+
+ARG DEBIAN_FRONTEND=noninteractive
 
 # xorg is older way of piping viewport to host machine, weston is Wayland (newer version).
 # either way, need to have server installed on host machine to receive output
@@ -27,7 +29,6 @@ RUN rustup component add rustfmt
 # cargo-watch is used for non-WASM build auto-reload
 # RUN cargo install trunk wasm-bindgen-cli cargo-watch
 
-ARG DEBIAN_FRONTEND=noninteractive
 # ENV LD_LIBRARY_PATH=/usr/lib/wsl/lib
 
 # Uncomment the lines below to use a 3rd party repository

@@ -1,6 +1,6 @@
 use bevy::{
     ecs::{
-        entity::{EntityMapper, MapEntities},
+        entity::MapEntities,
         reflect::ReflectMapEntities,
     },
     prelude::*,

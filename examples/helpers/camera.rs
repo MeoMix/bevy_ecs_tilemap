@@ -1,4 +1,4 @@
-use bevy::{input::ButtonInput, math::Vec3, prelude::*, render::camera::Camera};
+use bevy::prelude::*;
 
 // A simple camera system for moving and zooming the camera.
 #[allow(dead_code)]
