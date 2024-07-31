@@ -1,6 +1,6 @@
 # NOTE: mold linker doesn't support rustlang/rust:nightly - requires Debian. Swapping to rust:nightly would require using lld linker.
 # NOTE: mold does not support wasm https://github.com/rui314/mold/issues/555
-FROM rust:1.76-bookworm
+FROM rust:1.79-bookworm
 # FROM rustlang/rust:nightly
 
 ARG DEBIAN_FRONTEND=noninteractive
